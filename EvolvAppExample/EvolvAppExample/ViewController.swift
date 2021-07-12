@@ -29,8 +29,10 @@ class ViewController: UIViewController {
                         let data = body.data(using: .utf8)!
                         let configuration = try JSONDecoder().decode(Configuration.self, from: data)
                         let keys = self?.getKeys(from: configuration)
+
                         print("Configuration is: \(configuration)")
                         print("Keys: \(keys!)")
+                        
                     } catch let DecodingError.dataCorrupted(context) {
                         print(context)
                     } catch let DecodingError.keyNotFound(key, context) {

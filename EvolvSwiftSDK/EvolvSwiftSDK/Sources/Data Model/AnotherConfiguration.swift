@@ -45,8 +45,7 @@ public struct Experiment: Decodable {
         case predicate = "_predicate"
         case paused = "_paused"
         case id
-
-        //case web
+        case web
     }
 
     public init(from decoder: Decoder) throws {
@@ -56,7 +55,14 @@ public struct Experiment: Decodable {
         predicate = try container.decode(ExperimentPredicate.self, forKey: CodingKeys.predicate)
         paused = try container.decode(Bool.self, forKey: CodingKeys.paused)
         id = try container.decode(String.self, forKey: CodingKeys.id)
-        //experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.web)
+
+//        try container.allKeys.forEach { key in
+//            print(key)
+//            if (try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)).first != nil {
+//                self.experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)
+//            }
+//        }
+        experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.web)
     }
 }
 
@@ -95,10 +101,10 @@ public struct DecodedArrayOfExperimentKeys: Decodable {
 public class ExperimentKey: Decodable {
     public let isEntryPoint: Bool?
     public let predicate: ExperimentPredicate?
-    public let values: Bool?
+    public var values: Bool? = nil
     public let initializers: Bool?
-    public let dependencies: String?
-    //public let experimentKeys: DecodedArrayOfExperimentKeys? // here
+    public var dependencies: String? = nil
+    //public var experimentKeys: DecodedArrayOfExperimentKeys?
 
     public let experimentKeyId: String
 
@@ -108,7 +114,7 @@ public class ExperimentKey: Decodable {
         case values = "_values"
         case initializers = "_initializers"
         case dependencies
-        //case experimentKeys
+        //case cta_text
     }
 
     required public init(from decoder: Decoder) throws {
@@ -116,12 +122,22 @@ public class ExperimentKey: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         isEntryPoint = try container.decode(Bool.self, forKey: CodingKeys.isEntryPoint)
-        values = try container.decode(Bool.self, forKey: CodingKeys.values)
+        if let values = try container.decodeIfPresent(Bool.self, forKey: CodingKeys.values) {
+            self.values = values
+        }
         initializers = try container.decode(Bool.self, forKey: CodingKeys.initializers)
-        dependencies = try container.decode(String.self, forKey: CodingKeys.dependencies)
+        if let dependencies = try container.decodeIfPresent(String.self, forKey: CodingKeys.dependencies) {
+            self.dependencies = dependencies
+        }
         predicate = try container.decode(ExperimentPredicate.self, forKey: CodingKeys.predicate)
-        //experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.experimentKeys)
         experimentKeyId = container.codingPath.first!.stringValue
+
+//        try container.allKeys.forEach { [weak self] key in
+//            if !(try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)).isEmpty {
+//                self?.experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)
+//            }
+//        }
+//        experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.cta_text)
     }
 }
 
