@@ -24,12 +24,12 @@ public struct HttpConfig {
     public static let devDomain: String = "participants.evolv.ai"
     public static let stagingDomain: String = "participants-stg.evolv.ai"
     static let apiVersion: String = {
-        return "V\(version)"
+        return "v\(version)"
     }()
     static let version: Int = 1
     static let participantID: String = "C51EEAFC-724D-47F7-B99A-F3494357F164"
     static let environmentId: String = "8b50696b6c"
-    static let configurationEndpoint: String = "configurations.json"
+    static let configurationEndpoint: String = "configuration.json"
     static let allocationsEndpoint: String = "allocations"
     static let eventsEndpoint: String = "events"
     static let dataEndpoint: String = "data"
