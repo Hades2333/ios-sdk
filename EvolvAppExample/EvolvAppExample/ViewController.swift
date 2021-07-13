@@ -27,6 +27,7 @@ class ViewController: UIViewController {
                     print(body)
                     do {
                         let data = body.data(using: .utf8)!
+                        configurationData = data
                         let configuration = try JSONDecoder().decode(Configuration.self, from: data)
                         let keys = self?.getKeys(from: configuration)
 

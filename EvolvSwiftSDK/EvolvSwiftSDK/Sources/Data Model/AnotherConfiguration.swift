@@ -7,13 +7,7 @@
 
 import Foundation
 
-enum PossibleKeys: String, CaseIterable {
-    case web, home, next, layout, o7b7msnxd
-    case firstInner = "21zti3xj5"
-    case secondInner = "hlvg8909z"
-    case buttonColor = "button_color"
-    case ctaText = "cta_text"
-}
+public var configurationData: Foundation.Data?
 
 // MARK: - Configuration
 public struct Configuration: Decodable, EvolvConfig {
@@ -26,7 +20,6 @@ public struct Configuration: Decodable, EvolvConfig {
         case client = "_client"
         case experiments = "_experiments"
     }
-
 }
 
 // MARK: - Client
@@ -34,7 +27,7 @@ public struct Client: Codable {
     public let browser, device, location, platform: String
 }
 
-// MARK: - Experiment
+// MARK: - Experiment - это словарь
 public struct Experiment: Decodable {
     public var experimentKeys: DecodedArrayOfExperimentKeys?
     public let predicate: ExperimentPredicate?
@@ -56,13 +49,10 @@ public struct Experiment: Decodable {
         paused = try container.decode(Bool.self, forKey: CodingKeys.paused)
         id = try container.decode(String.self, forKey: CodingKeys.id)
 
-//        try container.allKeys.forEach { key in
-//            print(key)
-//            if (try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)).first != nil {
-//                self.experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)
-//            }
-//        }
-        experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.web)
+        guard let configurationData = configurationData else {
+            return
+        }
+        experimentKeys = try JSONDecoder().decode(DecodedArrayOfExperimentKeys.self, from: configurationData)
     }
 }
 
@@ -99,7 +89,7 @@ public struct DecodedArrayOfExperimentKeys: Decodable {
 }
 
 public class ExperimentKey: Decodable {
-    public let isEntryPoint: Bool?
+    public var isEntryPoint: Bool?
     public let predicate: ExperimentPredicate?
     public var values: Bool? = nil
     public let initializers: Bool?
@@ -114,14 +104,15 @@ public class ExperimentKey: Decodable {
         case values = "_values"
         case initializers = "_initializers"
         case dependencies
-        //case cta_text
     }
 
     required public init(from decoder: Decoder) throws {
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        isEntryPoint = try container.decode(Bool.self, forKey: CodingKeys.isEntryPoint)
+        if let isEntryPoint = try container.decodeIfPresent(Bool.self, forKey: CodingKeys.isEntryPoint) {
+            self.isEntryPoint = isEntryPoint
+        }
         if let values = try container.decodeIfPresent(Bool.self, forKey: CodingKeys.values) {
             self.values = values
         }
@@ -137,7 +128,7 @@ public class ExperimentKey: Decodable {
 //                self?.experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)
 //            }
 //        }
-//        experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.cta_text)
+        //experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.cta_text)
     }
 }
 
