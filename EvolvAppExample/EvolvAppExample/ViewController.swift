@@ -28,11 +28,12 @@ class ViewController: UIViewController {
                     do {
                         let data = body.data(using: .utf8)!
                         configurationData = data
+                        
                         let configuration = try JSONDecoder().decode(Configuration.self, from: data)
-                        let keys = self?.getKeys(from: configuration)
-
                         print("Configuration is: \(configuration)")
-                        print("Keys: \(keys!)")
+
+//                        let keys = self?.getKeys(from: configuration)
+//                        print("Keys: \(keys)")
                         
                     } catch let DecodingError.dataCorrupted(context) {
                         print(context)
@@ -54,20 +55,12 @@ class ViewController: UIViewController {
 
     // MARK: Methods
 
-    func getKeys(from configuration: Configuration) -> [String: ExperimentKey] {
-        var keysDictionary = [String: ExperimentKey]()
-        for experiment in configuration.experiments {
-
-            if let experimentKeys = experiment.experimentKeys {
-
-                for element in experimentKeys {
-                    print(element)
-                }
-            }
-
-
-        }
-        return keysDictionary
-    }
+//    func getKeys(from configuration: Configuration) -> [String: ExperimentKey] {
+//        var keysDictionary = [String: ExperimentKey]()
+//        configuration.experiments.forEach { experiment in
+//
+//        }
+//        return keysDictionary
+//    }
 }
 

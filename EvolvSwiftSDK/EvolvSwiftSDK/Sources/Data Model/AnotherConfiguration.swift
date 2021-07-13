@@ -9,9 +9,10 @@ import Foundation
 
 public var configurationData: Foundation.Data?
 
+
 // MARK: - Configuration
 public struct Configuration: Decodable, EvolvConfig {
-    public let published: Double
+    public let published: Float
     public let client: Client
     public let experiments: [Experiment]
 
@@ -20,6 +21,14 @@ public struct Configuration: Decodable, EvolvConfig {
         case client = "_client"
         case experiments = "_experiments"
     }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        published = try container.decode(Float.self, forKey: .published)
+        client = try container.decode(Client.self, forKey: .client)
+        experiments = try container.decode([Experiment].self, forKey: .experiments)
+    }
 }
 
 // MARK: - Client
@@ -27,9 +36,9 @@ public struct Client: Codable {
     public let browser, device, location, platform: String
 }
 
-// MARK: - Experiment - это словарь
+// MARK: - Experiment
 public struct Experiment: Decodable {
-    public var experimentKeys: DecodedArrayOfExperimentKeys?
+    public var experimentKeys: DecodedArrayOfExperimentKeys.DecodedArray?
     public let predicate: ExperimentPredicate?
     public let id: String?
     public let paused: Bool?
@@ -38,7 +47,6 @@ public struct Experiment: Decodable {
         case predicate = "_predicate"
         case paused = "_paused"
         case id
-        case web
     }
 
     public init(from decoder: Decoder) throws {
@@ -52,15 +60,15 @@ public struct Experiment: Decodable {
         guard let configurationData = configurationData else {
             return
         }
-        experimentKeys = try JSONDecoder().decode(DecodedArrayOfExperimentKeys.self, from: configurationData)
+        experimentKeys = try JSONDecoder().decode(DecodedArrayOfExperimentKeys.self, from: configurationData).arrayOfKeys
     }
 }
 
 public struct DecodedArrayOfExperimentKeys: Decodable {
 
-    public typealias DecodedArrayOfExperimentKeys = [ExperimentKey]
+    public typealias DecodedArray = [ExperimentKey]
 
-    public var array: DecodedArrayOfExperimentKeys
+    public var arrayOfKeys = DecodedArray()
 
     public struct DynamicCodingKeys: CodingKey {
 
@@ -80,23 +88,28 @@ public struct DecodedArrayOfExperimentKeys: Decodable {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         var tempArray = [ExperimentKey]()
 
+        // here must be dynamic keys
         for key in container.allKeys {
+            print("Key \(key)")
+
             let decodedObject = try container.decode(ExperimentKey.self, forKey: DynamicCodingKeys.init(stringValue: key.stringValue)!)
+            print("Decoded object: \(decodedObject)")
             tempArray.append(decodedObject)
         }
-        array = tempArray
+        arrayOfKeys = tempArray
     }
 }
 
 public class ExperimentKey: Decodable {
     public var isEntryPoint: Bool?
-    public let predicate: ExperimentPredicate?
+    public var predicate: ExperimentPredicate?
     public var values: Bool? = nil
-    public let initializers: Bool?
+    public var initializers: Bool?
     public var dependencies: String? = nil
-    //public var experimentKeys: DecodedArrayOfExperimentKeys?
+    public var experimentKeys: DecodedArrayOfExperimentKeys?
 
     public let experimentKeyId: String
+
 
     enum CodingKeys: String, CodingKey {
         case isEntryPoint = "_is_entry_point"
@@ -116,21 +129,24 @@ public class ExperimentKey: Decodable {
         if let values = try container.decodeIfPresent(Bool.self, forKey: CodingKeys.values) {
             self.values = values
         }
-        initializers = try container.decode(Bool.self, forKey: CodingKeys.initializers)
+        if let initializers = try container.decodeIfPresent(Bool.self, forKey: CodingKeys.initializers) {
+            self.initializers = initializers
+        }
         if let dependencies = try container.decodeIfPresent(String.self, forKey: CodingKeys.dependencies) {
             self.dependencies = dependencies
         }
-        predicate = try container.decode(ExperimentPredicate.self, forKey: CodingKeys.predicate)
+        if let predicate = try container.decodeIfPresent(ExperimentPredicate.self, forKey: CodingKeys.predicate) {
+            self.predicate = predicate
+        }
         experimentKeyId = container.codingPath.first!.stringValue
 
-//        try container.allKeys.forEach { [weak self] key in
-//            if !(try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)).isEmpty {
-//                self?.experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: key)
-//            }
-//        }
-        //experimentKeys = try container.decode(DecodedArrayOfExperimentKeys.self, forKey: CodingKeys.cta_text)
+        guard let configurationData = configurationData else {
+            return
+        }
+        experimentKeys = try JSONDecoder().decode(DecodedArrayOfExperimentKeys.self, from: configurationData)
     }
 }
+
 
 // MARK: - Rule
 public struct Rule: Decodable {
@@ -235,20 +251,20 @@ public struct ExperimentPredicate: Decodable {
 extension DecodedArrayOfExperimentKeys: Collection, Sequence {
 
     // Required nested types, that tell Swift what our collection contains
-    public typealias Index = DecodedArrayOfExperimentKeys.Index
-    public typealias Element = DecodedArrayOfExperimentKeys.Element
+    public typealias Index = DecodedArray.Index
+    public typealias Element = DecodedArray.Element
 
     // The upper and lower bounds of the collection, used in iterations
-    public var startIndex: Index { return array.startIndex }
-    public var endIndex: Index { return array.endIndex }
+    public var startIndex: Index { return arrayOfKeys.startIndex }
+    public var endIndex: Index { return arrayOfKeys.endIndex }
 
     // Required subscript, based on a dictionary index
     public subscript(index: Index) -> Iterator.Element {
-        get { return array[index] }
+        get { return arrayOfKeys[index] }
     }
 
     // Method that returns the next index when iterating
     public func index(after i: Index) -> Index {
-        return array.index(after: i)
+        return arrayOfKeys.index(after: i)
     }
 }

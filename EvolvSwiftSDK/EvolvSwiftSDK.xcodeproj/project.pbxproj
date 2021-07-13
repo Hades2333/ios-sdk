@@ -61,6 +61,7 @@
 		8DE7B38F26739423003E76A7 /* TypeCheckingConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE7B38E26739423003E76A7 /* TypeCheckingConversion.swift */; };
 		8DE7B39126739589003E76A7 /* EvolvError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE7B39026739589003E76A7 /* EvolvError.swift */; };
 		CEFF7ACE269C62AA006144CC /* AnotherConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEFF7ACD269C62AA006144CC /* AnotherConfiguration.swift */; };
+		CEFF7AD2269DA31F006144CC /* HardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEFF7AD1269DA31F006144CC /* HardConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,6 +132,7 @@
 		8DE7B38E26739423003E76A7 /* TypeCheckingConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeCheckingConversion.swift; sourceTree = "<group>"; };
 		8DE7B39026739589003E76A7 /* EvolvError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EvolvError.swift; sourceTree = "<group>"; };
 		CEFF7ACD269C62AA006144CC /* AnotherConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnotherConfiguration.swift; sourceTree = "<group>"; };
+		CEFF7AD1269DA31F006144CC /* HardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -297,6 +299,7 @@
 				8D9C60F8266F88630011EC8A /* Configuration.swift */,
 				8D9C61172670090D0011EC8A /* Data.swift */,
 				CEFF7ACD269C62AA006144CC /* AnotherConfiguration.swift */,
+				CEFF7AD1269DA31F006144CC /* HardConfiguration.swift */,
 			);
 			path = "Data Model";
 			sourceTree = "<group>";
@@ -484,6 +487,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D9C6108266F88640011EC8A /* Formatter.swift in Sources */,
+				CEFF7AD2269DA31F006144CC /* HardConfiguration.swift in Sources */,
 				8D9A1BF5268E3BCF00B302E6 /* AtomicProperty.swift in Sources */,
 				8D9A1BEB268DD71400B302E6 /* Event.swift in Sources */,
 				8DE7B39126739589003E76A7 /* EvolvError.swift in Sources */,
